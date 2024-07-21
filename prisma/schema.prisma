@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int                  @id @default(autoincrement())
+  login                String               @unique
+  email                String               @unique
+  password             String
+  name                 String?
+  first_surname        String?
+  second_surname       String?
+  role                 Role                 @default(CUSTOMER)
+  disctrict            String?
+  phone                String?
+  house_number         Int?
+  city                 String?
+  street               String?
+  activated            Boolean              @default(false)
+  activation_link      String               @unique
+  review               Review[]
+  user_review_liked    UserReviewLiked[]
+  user_pizza_favourite UserPizzaFavourite[]
+  user_pizza_liked     UserPizzaLiked[]
+
+  @@map("user")
+}
+
+model Pizza {
+  id                    Int
+  name                  String               @id
+  category              Category             @relation(references: [name], fields: [category_name])
+  category_name         String
+  added_at              DateTime
+  created_at            DateTime
+  available             Boolean              @default(true)
+  image                 String
+  discount              Int                  @default(0)
+  popular               Boolean              @default(false)
+  rating                Int                  @default(0)
+  country               String
+  flour                 Flour                @default(THICK)
+  average_cooking_speed Int                  @default(0)
+  hot_stage             HotStage             @default(MEDIUM)
+  additional_options    Additional_Options[]
+  user_pizza_favourite  UserPizzaFavourite[]
+  user_pizza_liked      UserPizzaLiked[]
+  order_item            OrderItem[]
+  CartItem              CartItem[]
+
+  @@map("pizza")
+}
+
+model Additional_Options {
+  id             Int           @id @default(autoincrement())
+  pizza          Pizza         @relation(references: [name], fields: [pizza_name], onDelete: Cascade)
+  pizza_name     String
+  size           Size          @default(MEDIUM)
+  weight         Int
+  calories       Int
+  price          Int
+  calories_stage CaloriesStage
+
+  @@map("additional_options")
+}
+
+model Review {
+  id                Int               @id
+  user              User              @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user_id           Int
+  text              String
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  user_review_liked UserReviewLiked[]
+
+  @@map("review")
+}
+
+model Category {
+  id          Int      @default(autoincrement())
+  name        String   @unique
+  description String
+  pizza       Pizza[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("category")
+}
+
+model Cart {
+  id          Int        @id @default(autoincrement())
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  total_price Int
+  amount      Int
+  CartItem    CartItem[]
+
+  @@map("cart")
+}
+
+model CartItem {
+  id         Int    @id @default(autoincrement())
+  cart       Cart   @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  pizza      Pizza  @relation(fields: [pizza_name], references: [name], onDelete: Cascade)
+  pizza_name String
+  cart_id    Int
+  amount     Int
+  size       Size
+
+  @@map("cart_item")
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  order_item  OrderItem[]
+  status      OrderStatus @default(PENDING)
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  total_price Int
+  amount      Int
+
+  @@map("order")
+}
+
+model OrderItem {
+  id         Int    @id @default(autoincrement())
+  order      Order  @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  pizza      Pizza  @relation(fields: [pizza_name], references: [name], onDelete: Cascade)
+  pizza_name String
+  order_id   Int
+  amount     Int
+  size       Size
+
+  @@map("order_item")
+}
+
+model UserReviewLiked {
+  id        Int    @id @default(autoincrement())
+  user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  review    Review @relation(fields: [review_id], references: [id], onDelete: Cascade)
+  review_id Int
+  user_id   Int
+
+  @@map("user_review__liked")
+}
+
+model UserPizzaLiked {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  pizza      Pizza    @relation(fields: [pizza_name], references: [name], onDelete: Cascade)
+  user_id    Int
+  pizza_name String
+  added_like DateTime @default(now())
+
+  @@map("user_pizza__likes")
+}
+
+model UserPizzaFavourite {
+  id         Int    @id @default(autoincrement())
+  user       User   @relation(fields: [user_id], references: [id])
+  pizza      Pizza  @relation(fields: [pizza_name], references: [name])
+  user_id    Int
+  pizza_name String
+  userId     Int
+  pizzaName  String
+
+  @@map("user_pizza__favourite")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum Flour {
+  THIN
+  THICK
+}
+
+enum HotStage {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum OrderStatus {
+  PENDING
+  INPROCESS
+  FULFILED
+}
+
+enum CaloriesStage {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Size {
+  SMALL
+  MEDIUM
+  BIG
+}
