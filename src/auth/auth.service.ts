@@ -15,21 +15,18 @@ export class AuthService {
   ) {
   }
 
-  async validateUser(loginUserDto: LoginUserDto): Promise<IUser> {
-    const {password} = loginUserDto;
-    const user = await this.usersService.findOneByEmailOrLogin(loginUserDto);
+  async validateUser(loginUserDto: LoginUserDto) {
+    const {password, ...rest} = loginUserDto;
+    
+    const user = await this.usersService.findOneByEmailOrLogin({...rest});
 
     const validPassword = await bcrypt.compare(password, user.password)
 
     if (user && validPassword) {
-      return {
-        id: user.id,
-        login: user.login,
-        role: user.role,
-      }
+      return user
     }
 
-    throw new UnauthorizedException()
+    throw new BadRequestException("Invalid login credentials")
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -53,7 +50,7 @@ export class AuthService {
   async register(regUserDto: RegUserDto) {
     const {login, email, password} = regUserDto;
 
-    const isUserExist = await this.usersService.findOneByEmailOrLogin(regUserDto);
+    const isUserExist = await this.usersService.findOneByEmailOrLogin({login, email});
 
     if (isUserExist) throw new BadRequestException("User with such login or email exists.");
 

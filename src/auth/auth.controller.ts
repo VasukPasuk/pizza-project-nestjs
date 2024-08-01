@@ -19,8 +19,10 @@ import * as process from "process";
 import {LoginUserDto} from "./dto/login-user.dto";
 import * as console from "console";
 import {Cookies} from "../_decorators/cookies.decorator";
+import {IRegisterResponseSuccess} from "../_interfaces";
+import {ApiTags} from "@nestjs/swagger";
 
-
+@ApiTags("Auth")
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {
@@ -34,10 +36,7 @@ export class AuthController {
     const {tokenPair, user} = await this.authService.login(loginUserDto);
     const {access_token, refresh_token} = tokenPair
 
-    response.cookie("refresh-token", refresh_token, {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      httpOnly: true
-    })
+    this.setRefreshTokenCookie(response, refresh_token);
 
     return {
       user,
@@ -47,7 +46,6 @@ export class AuthController {
 
   @Get('logout')
   @UseGuards(JwtAuthGuard)
-  @Redirect(process.env.FRONTEND_URL, 200)
   async logout(@Res() res: Response, @Req() req: Request) {
     res.clearCookie("refresh-token")
   }
@@ -59,7 +57,6 @@ export class AuthController {
   }
 
   @Patch('activate/:link')
-  @Redirect(process.env.FRONTEND_URL, 200)
   async activate(
     @Param("link") link: string,
   ) {
@@ -67,18 +64,48 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Res({passthrough: true}) response: Response, @Body() regUserDto: RegUserDto) {
+  async register(
+    @Res({passthrough: true}) response: Response,
+    @Body() regUserDto: RegUserDto):
+    Promise<IRegisterResponseSuccess>
+  {
     const {tokenPair, newUser} = await this.authService.register(regUserDto)
     const {refresh_token, access_token} = tokenPair;
+    this.setRefreshTokenCookie(response, refresh_token);
 
-    response.cookie("refresh-token", refresh_token, {
+    return this.createRegisterResponse(access_token, newUser);
+  }
+
+
+  private setRefreshTokenCookie(response: Response, refreshToken: string): void {
+    response.cookie("refresh-token", refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true
-    })
+    });
+  }
 
+  private createRegisterResponse(accessToken: string, newUser:any): IRegisterResponseSuccess {
     return {
-      user: newUser,
-      access_token
+      access_token: accessToken,
+      extra: {
+        isActivated: newUser.activated
+      },
+      profile: {
+        city: newUser.city,
+        district: newUser.disctrict,
+        email: newUser.email,
+        firstSurname: newUser.first_surname,
+        name: newUser.name,
+        phone: newUser.phone,
+        secondSurname: newUser.second_surname,
+        street: newUser.street,
+      },
+      user: {
+        id: newUser.id,
+        login: newUser.login,
+        role: newUser.role
+      },
     };
   }
+
 }

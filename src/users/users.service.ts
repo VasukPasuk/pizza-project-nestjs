@@ -15,7 +15,7 @@ export class UsersService {
   ) {
   }
 
-  async create(createUserDto: CreateUserDto): Promise<IUser> {
+  async create(createUserDto: CreateUserDto) {
     const {login, email, password} = createUserDto;
 
     const salt: string = await bcrypt.genSalt(10);
@@ -38,11 +38,6 @@ export class UsersService {
         password: hashedPassword,
         activation_link: genActivationLink
       },
-      select: {
-        role: true,
-        login: true,
-        id: true
-      }
     })
 
     if (!user) throw new BadRequestException()

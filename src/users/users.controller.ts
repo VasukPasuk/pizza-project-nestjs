@@ -2,8 +2,10 @@ import {Controller, Get, Patch, Param, Put, UseGuards, Req, ParseIntPipe} from '
 import { UsersService } from './users.service';
 import {JwtAuthGuard} from "../auth/guards/jwt-auth.guard";
 import {Request} from "express";
+import {ApiTags} from "@nestjs/swagger";
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
+@ApiTags("User")
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

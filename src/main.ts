@@ -6,16 +6,21 @@ import * as cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: "*"
+  })
+
   app.setGlobalPrefix('/api')
   app.use(cookieParser())
-  app.enableCors()
-  app.useGlobalPipes(new ValidationPipe());
-
+  app.useGlobalPipes(new ValidationPipe(
+    {
+      transform: true,
+    }
+  ));
   const config = new DocumentBuilder()
-    .setTitle('Pizza')
+    .setTitle('Pizza e-commerce back-end')
     .setDescription('Pizza e-commerce API description')
     .setVersion('1.0')
-    .addTag('pizza')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

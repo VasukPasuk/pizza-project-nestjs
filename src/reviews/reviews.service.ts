@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import {Injectable} from '@nestjs/common';
+import {CreateReviewDto} from './dto/create-review.dto';
+import {UpdateReviewDto} from './dto/update-review.dto';
+import {PrismaService} from "../prisma.service";
 
 @Injectable()
 export class ReviewsService {
-  create(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
+  constructor(private readonly prisma: PrismaService) {
   }
 
-  findAll() {
-    return `This action returns all reviews`;
+  async create(createReviewDto: CreateReviewDto) {
+    return this.prisma.review.create({
+      data: createReviewDto
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+  async update(id: number, updateReviewDto: UpdateReviewDto) {
+    return this.prisma.review.update({
+      where: {id},
+      data: updateReviewDto
+    });
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  async deleteById(id: number) {
+    return this.prisma.review.delete({where: {id}});
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+
+  async getAll({limit = 10, skip = 0, start = 0}:TestConfig) {
+    return this.prisma.review.findMany({
+      skip: skip,
+      take: limit,
+    })
   }
+}
+
+type TestConfig = {
+  limit: number,
+  skip: number,
+  start: number
 }
