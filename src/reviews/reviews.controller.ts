@@ -9,10 +9,8 @@ import {ApiTags} from "@nestjs/swagger";
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
-  @Get()
-  getAll() {
-    return this.reviewsService.getAll
+  @Post()
+  async create(@Body() createReviewDto: CreateReviewDto) {
+    return this.reviewsService.create(createReviewDto);
   }
-
-  // @Post()
 }

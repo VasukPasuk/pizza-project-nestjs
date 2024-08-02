@@ -1,4 +1,3 @@
-import {Transform} from 'class-transformer';
 import {OptionalBooleanQuery} from "../../_decorators/optionalBooleanQuery.decorator";
 
 export class GetWithQueriesDto {
@@ -7,4 +6,7 @@ export class GetWithQueriesDto {
 
   @OptionalBooleanQuery()
   Review?: boolean = false;
+
+  @OptionalBooleanQuery()
+  additional_options?: boolean = false;
 }

@@ -35,9 +35,15 @@ export class AdditionalOptionsService {
     return result;
   }
 
+  async getAllAddOptionsOfPizza(name: string) {
+    return this.prisma.additional_Options.findMany({
+      where: {pizza_name: {equals: name, mode: "insensitive"}},
+    })
+  }
+
   async getByPizzaNameAndSize(name: string, size: Size) {
     return this.prisma.additional_Options.findFirst({
-      where: {pizza_name: name, size: size},
+      where: {pizza_name: {equals: name, mode: "insensitive"}, size: size.toUpperCase() as Size},
     })
   }
 

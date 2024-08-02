@@ -115,6 +115,12 @@ export class PizzaController {
   }
 
 
+
+  @Get('category/:name')
+  getAllByCategory(@Param('name') name: string) {
+    return this.pizzaService.getAllByCategory(name)
+  }
+
   // ADDITION OPTIONS CONTROLLER METHODS
 
   @ApiOperation({
@@ -141,8 +147,13 @@ export class PizzaController {
   }
 
   @Get(":name/additional/:size") // Process GET http://localhost/pizza/{name}/additional/{size}
-  async getAddOption(@Param('name') name: string, @Param('id') size: Size) {
+  async getAddOption(@Param('name') name: string, @Param('size') size: Size) {
     return this.additionalOptionsService.getByPizzaNameAndSize(name, size)
+  }
+
+  @Get(':name/additional') // Process GET http://localhost/pizza/{name}/additional
+  async getAllAddOptionsOfPizza(@Param('name') name: string) {
+    return this.additionalOptionsService.getAllAddOptionsOfPizza(name)
   }
 
   @Delete(':name/additional') // Process DELETE http://localhost/pizza/{name}/additional

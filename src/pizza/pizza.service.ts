@@ -52,4 +52,8 @@ export class PizzaService {
   async getOneByNameAndWith(name: string, getWithQueriesDto: GetWithQueriesDto) {
     return this.prisma.pizza.findUnique({where: {name: name}, include: {...getWithQueriesDto}});
   }
+
+  async getAllByCategory(category: string) {
+    return this.prisma.pizza.findMany({where: {category_name: category}});
+  }
 }

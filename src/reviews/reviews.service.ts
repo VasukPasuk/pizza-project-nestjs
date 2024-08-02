@@ -14,28 +14,22 @@ export class ReviewsService {
     })
   }
 
-  async update(id: number, updateReviewDto: UpdateReviewDto) {
-    return this.prisma.review.update({
-      where: {id},
-      data: updateReviewDto
-    });
-  }
+  // async update(id: number, updateReviewDto: UpdateReviewDto) {
+  //   return this.prisma.review.update({
+  //     where: {id},
+  //     data: updateReviewDto
+  //   });
+  // }
 
-  async deleteById(id: number) {
-    return this.prisma.review.delete({where: {id}});
-  }
+  // async deleteById(id: number) {
+  //   return this.prisma.review.delete({where: {id}});
+  // }
 
 
-  async getAll({limit = 10, skip = 0, start = 0}:TestConfig) {
-    return this.prisma.review.findMany({
-      skip: skip,
-      take: limit,
-    })
-  }
-}
-
-type TestConfig = {
-  limit: number,
-  skip: number,
-  start: number
+  // async getAll({limit = 10, skip = 0, start = 0}:TestConfig) {
+  //   return this.prisma.review.findMany({
+  //     skip: skip,
+  //     take: limit,
+  //   })
+  // }
 }

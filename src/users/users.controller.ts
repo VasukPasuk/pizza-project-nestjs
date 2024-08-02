@@ -6,15 +6,15 @@ import {ApiTags} from "@nestjs/swagger";
 
 // @UseGuards(JwtAuthGuard)
 @ApiTags("User")
-@Controller('users')
+@Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get()
   findAll(@Req() req: Request ) {
-    console.log(req.user)
+    // console.log(req.user)
 
     return this.usersService.findAll();
   }
